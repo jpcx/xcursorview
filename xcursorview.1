@@ -1,0 +1,55 @@
+.\" xcursorview.1
+.TH XCURSORVIEW 1 "19 March 2023" "Version 1.0.0" "xcursorview User Manual"
+
+.SH NAME
+xcursorview \- Tracks an xinput cursor and draws a crosshair at its position.
+
+.SH SYNOPSIS
+.B xcursorview
+[\fB\-w\fR \fIwidth\fR] [\fB\-c\fR \fIcolor\fR] [\fB\-Fh\fR] \fIdevice\fR
+
+.SH DESCRIPTION
+.B xcursorview
+is an Xorg daemon that tracks an xinput cursor and draws a crosshair at its position.
+Crosshair width and color are customizable.
+Useful for debugging, minimal environments, or issues related to cursor rendering.
+
+.SH OPTIONS
+.TP
+.B \-w, \-\-width \fIwidth\fR
+Set the total crosshair width (default: 11).
+.TP
+.B \-c, \-\-color \fIcolor\fR
+Set the crosshair color as a hex value (default: 0x800080).
+.TP
+.B \-F, \-\-foreground
+Do not daemonize.
+.TP
+.B \-h, \-\-help
+Display help information and exit.
+
+.SH ARGUMENTS
+.TP
+.B \fIdevice\fR
+The xinput device ID.
+
+.SH EXAMPLES
+Draw a crosshair with default width and color for the xinput device ID 42:
+.P
+.B xcursorview 42
+.P
+Draw a crosshair with width 15 and color 0x123456 for the xinput device ID 42:
+.P
+.B xcursorview -w 15 -c 0x123456 42
+
+.SH AUTHOR
+Written by Justin Collier.
+
+.SH COPYRIGHT
+Copyright (C) 2023 Justin Collier <m@jpcx.dev>
+.br
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+.br
+This is free software: you are free to change and redistribute it.
+.br
+There is NO WARRANTY, to the extent permitted by law.
