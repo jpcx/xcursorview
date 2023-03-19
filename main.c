@@ -24,28 +24,28 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define ASSERT(_expr_, _why_)                      \
-	do {                                           \
-		if (!(_expr_)) {                           \
+#define ASSERT(_expr_, _why_) \
+	do { \
+		if (!(_expr_)) { \
 			fprintf(stderr, "Error: " _why_ "\n"); \
-			exit(1);                               \
-		}                                          \
+			exit(1); \
+		} \
 	} while (0)
 
-#define PRINT_HELP(_argv0_)                                                   \
-	printf("Usage: %s [-w width] [-c color] [-Fh] device\n"                   \
+#define PRINT_HELP(_argv0_) \
+	printf("Usage: %s [-w width] [-c color] [-Fh] device\n" \
 	       "Tracks an xinput cursor and draws a crosshair at its position.\n" \
-	       "\n"                                                               \
-	       "Options:\n"                                                       \
+	       "\n" \
+	       "Options:\n" \
 	       "  -w, --width width     Set the total crosshair width (default: " \
-	       "11)\n"                                                            \
-	       "  -c, --color color     Set the crosshair color as a hex value "  \
-	       "(default: 0x800080)\n"                                            \
-	       "  -F, --foreground      Do not daemonize.\n"                      \
-	       "  -h, --help            Display this help text and exit\n"        \
-	       "\n"                                                               \
-	       "Arguments:\n"                                                     \
-	       "  device                The xinput device ID\n",                  \
+	       "11)\n" \
+	       "  -c, --color color     Set the crosshair color as a hex value " \
+	       "(default: 0x800080)\n" \
+	       "  -F, --foreground      Do not daemonize.\n" \
+	       "  -h, --help            Display this help text and exit\n" \
+	       "\n" \
+	       "Arguments:\n" \
+	       "  device                The xinput device ID\n", \
 	       _argv0_)
 
 int
@@ -99,11 +99,12 @@ main(int argc, char** argv) {
 		}
 	}
 
-	// initialize display, screen, and root
+	// post-args initializations
 	Display* dpy = XOpenDisplay(NULL);
 	ASSERT(dpy, "Could not open display.");
-	int    scr  = DefaultScreen(dpy);
-	Window root = DefaultRootWindow(dpy);
+	int    scr    = DefaultScreen(dpy);
+	Window root   = DefaultRootWindow(dpy);
+	int    hwidth = width / 2;
 
 	// opcode for XInput
 	int opcode;
@@ -144,6 +145,10 @@ main(int argc, char** argv) {
 		XSetForeground(dpy, gc, 0xFF000000 | color);
 		XSetLineAttributes(dpy, gc, 1, LineSolid, CapButt, JoinMiter);
 		XSetWindowBackground(dpy, win, 0x00000000);
+
+		XClearWindow(dpy, win);
+		XDrawLine(dpy, win, gc, 0, hwidth, width, hwidth);
+		XDrawLine(dpy, win, gc, hwidth, 0, hwidth, width);
 	}
 
 	{ // make window intangible
@@ -170,8 +175,6 @@ main(int argc, char** argv) {
 		XISelectEvents(dpy, root, &evmask, 1);
 	}
 
-	int hwidth = width / 2;
-
 	if (foreground || !fork()) {
 		while (1) {
 			XEvent               ev;
@@ -181,18 +184,10 @@ main(int argc, char** argv) {
 
 			if (XGetEventData(dpy, cookie) && cookie->type == GenericEvent &&
 			    cookie->extension == opcode && cookie->evtype == XI_Motion) {
-				{ // move window to new cursor position
-					XIDeviceEvent* ev = (XIDeviceEvent*)cookie->data;
-					XMoveWindow(dpy, win, ev->event_x - hwidth,
-					            ev->event_y - hwidth);
-				}
-
-				// clear and redraw crosshairs
-
-				XClearWindow(dpy, win);
-				XDrawLine(dpy, win, gc, 0, hwidth, width, hwidth);
-				XDrawLine(dpy, win, gc, hwidth, 0, hwidth, width);
-				XFlush(dpy);
+				// move window to new cursor position
+				XIDeviceEvent* ev = (XIDeviceEvent*)cookie->data;
+				XMoveWindow(dpy, win, ev->event_x - hwidth,
+				            ev->event_y - hwidth);
 			}
 
 			XFreeEventData(dpy, cookie);

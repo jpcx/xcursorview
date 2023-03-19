@@ -1,0 +1,10 @@
+2023-03-19  Justin Collier  <m@jpcx.dev>
+
+	1.0.1 Efficiency Patch
+
+	* main.c (daemon loop): Moved crosshairs drawing to window init.
+	Crosshairs are no longer redrawn each event.
+
+2023-03-19  Justin Collier  <m@jpcx.dev>
+
+	1.0.0 Initial Release

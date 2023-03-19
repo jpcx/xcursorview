@@ -1,4 +1,4 @@
-# xcursorview 1.0.0
+# xcursorview 1.0.1
 
 xcursorview is an Xorg daemon that tracks an xinput cursor and draws a crosshair at its position.
 Crosshair width and color are customizable.
